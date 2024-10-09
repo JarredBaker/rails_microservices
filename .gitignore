@@ -71,3 +71,4 @@ yarn-debug.log*
 .keep
 .idea
 .idea/
+.DS_Store
