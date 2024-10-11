@@ -26,7 +26,7 @@ const LogIn: React.FC = () => {
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
-
+  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setFormData({
@@ -38,19 +38,21 @@ const LogIn: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
 
-    const response = await ApiService.login({user: {...formData, name: ''}});
+    await ApiService.login({user: {...formData, name: ''}}).then((response) => {
+      const token = response.headers['authorization'];
 
-    const token = response.headers['authorization'];
-
-    if (token && response.data) {
-      const {email, name, id} = response.data.data; // Extract user data from response
-      console.log("The email: " + email);
-      dispatch(setUser({user: {email, name, id}, token})); // Dispatch to Redux
-      // setSuccess(true);
-      navigate('/'); // Navigate to a protected route
-    } else {
-      throw new Error('Token not found in response headers');
-    }
+      if (token && response.data) {
+        const {email, name, id} = response.data.data; // Extract user data from response
+        console.log("The email: " + email);
+        dispatch(setUser({user: {email, name, id}, token})); // Dispatch to Redux
+        // setSuccess(true);
+        navigate('/'); // Navigate to a protected route
+      } else {
+        throw new Error('Token not found in response headers');
+      }
+    }).catch((error) => {
+      setError(error.response.data.errors);
+    })
   }
 
   return (
@@ -58,11 +60,14 @@ const LogIn: React.FC = () => {
       <p className={"font-satisfy text-8xl pl-16 pt-16 text-slate-700 mb-24"}>
         Welcome to the boutique store
       </p>
-      <div className="signup-form font-satisfy">
-        <h2 className={"text-2xl"}>Log In</h2>
+      <div className="signup-form">
+        <h2 className={"text-2xl font-satisfy"}>Log In</h2>
+        { error && (
+          <p className={"text-red-500 text-center"}>{error}</p>
+        )}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="email" className={"text-2xl"}>Email:</label>
+            <label htmlFor="email" className={"text-2xl font-satisfy"}>Email:</label>
             <input
               type="email"
               id="email"
@@ -74,7 +79,7 @@ const LogIn: React.FC = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="password" className={"text-2xl"}>Password:</label>
+            <label htmlFor="password" className={"text-2xl font-satisfy"}>Password:</label>
             <input
               type="password"
               id="password"

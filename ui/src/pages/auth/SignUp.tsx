@@ -4,7 +4,7 @@ import ApiService from '../../api/authApi';
 import {setUser} from '../../store/userSlice';
 import {useDispatch} from 'react-redux';
 import axios, {AxiosError} from 'axios';
-import { Link } from 'react-router-dom';
+import {Link} from 'react-router-dom';
 
 interface FormData {
   name: string;
@@ -43,6 +43,7 @@ const SignUp: React.FC = () => {
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
+  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setFormData({
@@ -73,10 +74,9 @@ const SignUp: React.FC = () => {
 
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length === 0) {
-      try {
-        // Use the ApiService to send the sign-up request
-        const response = await ApiService.signUp({user: formData});
 
+      // Use the ApiService to send the sign-up request
+      await ApiService.signUp({user: formData}).then((response) => {
         console.log(JSON.stringify(response.headers));
 
         const token = response.headers['authorization'];
@@ -92,21 +92,11 @@ const SignUp: React.FC = () => {
         } else {
           throw new Error('Token not found in response headers');
         }
+      }).then((error) => {
 
-      } catch (err) {
-        // Handle both Axios errors and other thrown errors
-        if (axios.isAxiosError(err)) {
-          const axiosError = err as AxiosError<ApiResponse>;
-          if (axiosError.response) {
-            // setError(axiosError.response.data.status.message); // Use the error message from API response
-          } else {
-            // setError('An unexpected error occurred. Please try again.');
-          }
-        } else {
-          // setError(err instanceof Error ? err.message : 'An unexpected error occurred.');
-        }
-      }
-
+      }).catch((error) => {
+        setError(error.response.data.errors || error.response.data.status.message);
+      })
     } else {
       setErrors(validationErrors);
     }
@@ -117,11 +107,14 @@ const SignUp: React.FC = () => {
       <p className={"font-satisfy text-8xl pl-16 pt-16 text-slate-700 mb-24"}>
         Welcome to the boutique store
       </p>
-      <div className="signup-form font-satisfy">
-        <h2 className={"text-2xl"}>Sign Up</h2>
+      <div className="signup-form">
+        <h2 className={"text-2xl font-satisfy"}>Sign Up</h2>
+        { error && (
+          <p className={"text-red-500 text-center"}>{error}</p>
+        )}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="name" className={"text-2xl"}>Name:</label>
+            <label htmlFor="name" className={"text-2xl font-satisfy"}>Name:</label>
             <input
               type="text"
               id="name"
@@ -133,7 +126,7 @@ const SignUp: React.FC = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="email" className={"text-2xl"}>Email:</label>
+            <label htmlFor="email" className={"text-2xl font-satisfy"}>Email:</label>
             <input
               type="email"
               id="email"
@@ -145,7 +138,7 @@ const SignUp: React.FC = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="password" className={"text-2xl"}>Password:</label>
+            <label htmlFor="password" className={"text-2xl font-satisfy"}>Password:</label>
             <input
               type="password"
               id="password"
