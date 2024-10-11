@@ -6,6 +6,7 @@ import ProductHome from "./pages/products/ProductHome";
 import {useSelector} from 'react-redux';
 import {RootState} from './store';
 import {useEffect} from "react";
+import LogIn from "./pages/auth/LogIn";
 
 function App() {
   const isAuthenticated = useSelector((state: RootState) => state.user.isAuthenticated);
@@ -27,7 +28,10 @@ function App() {
                 <ProductHome/>
               </PrivateRoute>}/>
         ) : (
-          <Route path="/" element={<SignUp/>}/>
+          <>
+            <Route path="/" element={<SignUp/>}/>
+            <Route path="/login" element={<LogIn/>}/>
+          </>
         )}
       </Routes>
     </Router>

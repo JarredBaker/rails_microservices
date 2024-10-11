@@ -4,6 +4,7 @@ import ApiService from '../../api/authApi';
 import {setUser} from '../../store/userSlice';
 import {useDispatch} from 'react-redux';
 import axios, {AxiosError} from 'axios';
+import { Link } from 'react-router-dom';
 
 interface FormData {
   name: string;
@@ -155,7 +156,10 @@ const SignUp: React.FC = () => {
             {errors.password && <p className="error">{errors.password}</p>}
           </div>
 
-          <button type="submit" className={"mt-12"}>Sign Up</button>
+          <div className={"grid grid-cols-2 gap-2"}>
+            <Link to="/login" className={"mt-12 block w-100 bg-cyan-300 p-4 text-center rounded cursor-pointer"}>Log in</Link>
+            <button type="submit" className={"mt-12"}>Sign Up</button>
+          </div>
         </form>
       </div>
     </div>

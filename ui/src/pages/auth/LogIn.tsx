@@ -1,6 +1,11 @@
 import React, {useState} from 'react';
+import {Link, useNavigate} from 'react-router-dom';
+import ApiService from "../../api/authApi";
+import {setUser} from "../../store/userSlice";
+import {useDispatch} from 'react-redux';
 
 interface FormData {
+
   email: string;
   password: string;
 }
@@ -12,6 +17,9 @@ interface FormErrors {
 }
 
 const LogIn: React.FC = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState<FormData>({
     email: '',
     password: ''
@@ -29,6 +37,20 @@ const LogIn: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
+
+    const response = await ApiService.login({user: {...formData, name: ''}});
+
+    const token = response.headers['authorization'];
+
+    if (token && response.data) {
+      const {email, name, id} = response.data.data; // Extract user data from response
+      console.log("The email: " + email);
+      dispatch(setUser({user: {email, name, id}, token})); // Dispatch to Redux
+      // setSuccess(true);
+      navigate('/'); // Navigate to a protected route
+    } else {
+      throw new Error('Token not found in response headers');
+    }
   }
 
   return (
@@ -63,7 +85,10 @@ const LogIn: React.FC = () => {
             {errors.password && <p className="error">{errors.password}</p>}
           </div>
 
-          <button type="submit" className={"mt-12"}>Sign Up</button>
+          <div className={"grid grid-cols-2 gap-2"}>
+            <Link to="/" className={"mt-12 block w-100 bg-cyan-300 p-4 text-center rounded cursor-pointer"}>Sign up</Link>
+            <button type="submit" className={"mt-12"}>Log In</button>
+          </div>
         </form>
       </div>
     </div>

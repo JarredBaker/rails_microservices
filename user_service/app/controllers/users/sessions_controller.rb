@@ -9,10 +9,8 @@ class Users::SessionsController < Devise::SessionsController
 
   def respond_with(current_user, _opts = {})
     render json: {
-      status: {
-        code: 200, message: 'Logged in successfully.',
-        data: { user: UserSerializer.new(current_user).serializable_hash[:data][:attributes] }
-      }
+      status: { code: 200, message: 'Logged in successfully.', },
+      data: UserSerializer.new(current_user).serializable_hash[:data][:attributes]
     }, status: :ok
   end
 
@@ -34,6 +32,7 @@ class Users::SessionsController < Devise::SessionsController
       }, status: :unauthorized
     end
   end
+
   # before_action :configure_sign_in_params, only: [:create]
 
   # GET /resource/sign_in
