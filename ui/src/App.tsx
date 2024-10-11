@@ -1,16 +1,37 @@
 import './App.css';
 import SignUp from "./pages/auth/SignUp";
+import {BrowserRouter as Router, Routes, Route, Link} from 'react-router-dom';
+import PrivateRoute from "./components/PrivateRoute";
+import ProductHome from "./pages/products/ProductHome";
+import {useSelector} from 'react-redux';
+import {RootState} from './store';
+import {useEffect} from "react";
 
 function App() {
-	return (
-		<div className="min-h-screen min-w-screen p-8 bg-amber-50">
-			<p className={"font-satisfy text-8xl pl-16 pt-16 text-slate-700 mb-24"}>
-				Welcome to the boutique store
-			</p>
+  const isAuthenticated = useSelector((state: RootState) => state.user.isAuthenticated);
+  const token = useSelector((state: RootState) => state.user.token);
 
-			<SignUp />
-		</div>
-	);
+  useEffect(() => {
+    console.log("Authed: " + isAuthenticated);
+    console.log("Token " + token);
+  }, [isAuthenticated, token])
+
+  return (
+    <Router>
+      <Routes>
+        {isAuthenticated ? (
+          <Route
+            path="/"
+            element={
+              <PrivateRoute>
+                <ProductHome/>
+              </PrivateRoute>}/>
+        ) : (
+          <Route path="/" element={<SignUp/>}/>
+        )}
+      </Routes>
+    </Router>
+  );
 }
 
 export default App;

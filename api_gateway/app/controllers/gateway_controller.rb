@@ -15,8 +15,12 @@ class GatewayController < ApplicationController
       req.body = request.body.read if %w[post put patch].include?(request.method.downcase)
     end
 
-    # Render the service's response back to the client
-    render json: response.body, status: response.status
+    if response.headers['Authorization'].present?
+      headers['Authorization'] = response.headers['Authorization'] # Set the token in the response headers
+    end
+
+    # Return the user data and the status code from the User Service
+    render json: JSON.parse(response.body), status: response.status
   rescue Faraday::ConnectionFailed
     render json: { error: 'Service unavailable' }, status: 503
   end
