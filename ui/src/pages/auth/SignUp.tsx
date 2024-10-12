@@ -151,7 +151,7 @@ const SignUp: React.FC = () => {
 
           <div className={"grid grid-cols-2 gap-2"}>
             <Link to="/login" className={"mt-12 block w-100 bg-cyan-300 p-4 text-center rounded cursor-pointer"}>Log in</Link>
-            <button type="submit" className={"mt-12"}>Sign Up</button>
+            <button type="submit" className={"mt-12 bg-emerald-300 rounded cursor-pointer"}>Sign Up</button>
           </div>
         </form>
       </div>

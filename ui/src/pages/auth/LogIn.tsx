@@ -92,7 +92,7 @@ const LogIn: React.FC = () => {
 
           <div className={"grid grid-cols-2 gap-2"}>
             <Link to="/" className={"mt-12 block w-100 bg-cyan-300 p-4 text-center rounded cursor-pointer"}>Sign up</Link>
-            <button type="submit" className={"mt-12"}>Log In</button>
+            <button type="submit" className={"mt-12 bg-emerald-300 rounded cursor-pointer"}>Log In</button>
           </div>
         </form>
       </div>
