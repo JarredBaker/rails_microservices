@@ -104,6 +104,13 @@ bundle exec rails s -p 3003 # Order service.
 ```
 
 #### Access the Frontend:
+
+Create a `.env` file at the root directory and add the following: 
+
+```bash
+PORT=8080
+```
+
 ```bash
 cd frontend
 npm install
