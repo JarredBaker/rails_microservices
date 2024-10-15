@@ -65,8 +65,8 @@ const SignUp: React.FC = () => {
         const token = response.headers['authorization'];
 
         if (token && response.data) {
-          const {email, name, id} = response.data.data; // Extract user data from response
-          dispatch(setUser({user: {email, name, id}, token})); // Dispatch to Redux
+          const {email, name, id} = response.data.data;
+          dispatch(setUser({user: {email, name, id}, token}));
         } else {
           throw new Error('Token not found in response headers');
         }
