@@ -1,9 +1,4 @@
 Rails.application.routes.draw do
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
-
-  # Defines the root path route ("/")
-  # root "articles#index"
-
   get '/users/*path', to: 'gateway#proxy', defaults: { service: 'user_service' }
   get '/products/*path', to: 'gateway#proxy', defaults: { service: 'product_service' }
   get '/orders/*path', to: 'gateway#proxy', defaults: { service: 'order_service' }
@@ -11,4 +6,8 @@ Rails.application.routes.draw do
   post '/users/*path', to: 'gateway#proxy', defaults: { service: 'user_service' }
   post '/products/*path', to: 'gateway#proxy', defaults: { service: 'product_service' }
   post '/orders/*path', to: 'gateway#proxy', defaults: { service: 'order_service' }
+
+  delete '/users/*path', to: 'gateway#proxy', defaults: { service: 'user_service' }
+
+  get '/rails/active_storage/blobs/*path', to: 'gateway#proxy_image'
 end

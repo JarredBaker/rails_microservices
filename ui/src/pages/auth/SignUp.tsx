@@ -3,7 +3,6 @@ import './Auth.css';
 import ApiService from '../../api/authApi';
 import {setUser} from '../../store/userSlice';
 import {useDispatch} from 'react-redux';
-import axios, {AxiosError} from 'axios';
 import {Link} from 'react-router-dom';
 
 interface FormData {
@@ -17,21 +16,6 @@ interface FormErrors {
   email?: string;
   password?: string;
 }
-
-interface UserData {
-  id: number;
-  email: string;
-  name: string;
-}
-
-interface ApiResponse {
-  status: {
-    code: number;
-    message: string;
-  };
-  data: UserData;
-}
-
 
 const SignUp: React.FC = () => {
   const dispatch = useDispatch();
@@ -75,25 +59,17 @@ const SignUp: React.FC = () => {
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length === 0) {
 
-      // Use the ApiService to send the sign-up request
       await ApiService.signUp({user: formData}).then((response) => {
         console.log(JSON.stringify(response.headers));
 
         const token = response.headers['authorization'];
 
-        console.log("The token: " + token);
-
         if (token && response.data) {
           const {email, name, id} = response.data.data; // Extract user data from response
-          console.log("The email: " + email);
           dispatch(setUser({user: {email, name, id}, token})); // Dispatch to Redux
-          // setSuccess(true);
-          // navigate('/dashboard'); // Navigate to a protected route
         } else {
           throw new Error('Token not found in response headers');
         }
-      }).then((error) => {
-
       }).catch((error) => {
         setError(error.response.data.errors || error.response.data.status.message);
       })

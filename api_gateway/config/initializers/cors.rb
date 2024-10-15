@@ -7,7 +7,7 @@
 
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    origins '*' # TODO: later change to the domain of the frontend app
+    origins ['http://localhost:8080', "http://localhost:3000", "http://localhost:3002", "http://localhost:3003"]
     resource '*',
              headers: :any,
              methods: %i[get post put patch delete options head],

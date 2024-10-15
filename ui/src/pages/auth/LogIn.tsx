@@ -5,7 +5,6 @@ import {setUser} from "../../store/userSlice";
 import {useDispatch} from 'react-redux';
 
 interface FormData {
-
   email: string;
   password: string;
 }
@@ -43,10 +42,8 @@ const LogIn: React.FC = () => {
 
       if (token && response.data) {
         const {email, name, id} = response.data.data; // Extract user data from response
-        console.log("The email: " + email);
         dispatch(setUser({user: {email, name, id}, token})); // Dispatch to Redux
-        // setSuccess(true);
-        navigate('/'); // Navigate to a protected route
+        navigate('/');
       } else {
         throw new Error('Token not found in response headers');
       }

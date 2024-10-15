@@ -1,44 +1,47 @@
 # app/controllers/gateway_controller.rb
+#
 class GatewayController < ApplicationController
-  # Proxy incoming requests to the appropriate microservice based on the URL path
+  before_action :validate_token_user_service, unless: :whitelisted_route?, only: :proxy
+  include Proxyable
+  include ImageProxyable
+  include TokenValidation
+
+  ##
+  # Entry point to the microservice. Performs related forwarding, validation and result set processing.
+  #
   def proxy
-    service_url = determine_service_url
+    response = proxy_request
+    headers['Authorization'] = response.headers['Authorization'] if response.headers['Authorization'].present?
 
-    # Forward the incoming request to the appropriate service
-    response = Faraday.send(request.method.downcase) do |req|
-      req.url "#{service_url}#{request.fullpath}"
-      req.headers['Content-Type'] = 'application/json'
-      req.headers['X-Api-Key'] = "als234qdscasdafasdfasdcaklncpiUASCGLKabcso3onSSKJADCNKASDBCJAKVkhsjvcaCScdjnasdncj03" # TODO: store this securely
-      req.headers['Authorization'] = request.headers['Authorization'] if request.headers['Authorization'].present?
-
-      # Forward the request body (for POST, PUT, PATCH requests)
-      req.body = request.body.read if %w[post put patch].include?(request.method.downcase)
+    if response.body.blank?
+      render json: { error: 'Something went wrong, please try again later.' }, status: :unprocessable_entity
+    else
+      render json: JSON.parse(response.body || "{}"), status: response.status
     end
 
-    if response.headers['Authorization'].present?
-      headers['Authorization'] = response.headers['Authorization'] # Set the token in the response headers
-    end
-
-    # Return the user data and the status code from the User Service
-    render json: JSON.parse(response.body), status: response.status
   rescue Faraday::ConnectionFailed
     render json: { error: 'Service unavailable' }, status: 503
   end
 
+  ##
+  # Entry point for image access. Forwards the request's the the related service and
+  # sends the image data back to the user.
+  def proxy_image
+    response = forward_image_proxy
+
+    if response.success?
+      send_data response.body, type: response.headers['Content-Type'], disposition: 'inline'
+    else
+      render json: { error: 'Image not found' }, status: :not_found
+    end
+  end
+
   private
 
-  # TODO: setup docker here for the correct URLs: http://product_service:3002
-  # This method determines which service URL to forward the request to based on the path
-  def determine_service_url
-    case request.fullpath
-    when /^\/users/
-      'http://localhost:3000'
-    when /^\/products/
-      'http://product_service:3002'
-    when /^\/orders/
-      'http://order_service:3003'
-    else
-      render json: { error: 'Service not found' }, status: 404
-    end
+  ##
+  #  Whitelisted urls that are excluded from token based authentication.
+  def whitelisted_route?
+    whitelisted_paths = %w[/users/logout /users/login /users/signup]
+    whitelisted_paths.include?(request.path)
   end
 end

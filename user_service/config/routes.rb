@@ -12,4 +12,5 @@ Rails.application.routes.draw do
     sessions: 'users/sessions',
     registrations: 'users/registrations'
   }
+  post 'validate_token', to: 'tokens#validate_token'
 end

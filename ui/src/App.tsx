@@ -5,17 +5,11 @@ import PrivateRoute from "./components/PrivateRoute";
 import ProductHome from "./pages/products/ProductHome";
 import {useSelector} from 'react-redux';
 import {RootState} from './store';
-import {useEffect} from "react";
 import LogIn from "./pages/auth/LogIn";
+import YourOrders from "./pages/orders/YourOrders";
 
 function App() {
   const isAuthenticated = useSelector((state: RootState) => state.user.isAuthenticated);
-  const token = useSelector((state: RootState) => state.user.token);
-
-  useEffect(() => {
-    console.log("Authed: " + isAuthenticated);
-    console.log("Token " + token);
-  }, [isAuthenticated, token])
 
   return (
     <Router>
@@ -28,11 +22,17 @@ function App() {
                 <ProductHome/>
               </PrivateRoute>}/>
         ) : (
-          <>
-            <Route path="/" element={<SignUp/>}/>
-            <Route path="/login" element={<LogIn/>}/>
-          </>
+          <Route path="/" element={<SignUp/>}/>
         )}
+
+        <Route path="/login" element={<LogIn/>}/>
+
+        <Route
+          path="/orders"
+          element={
+            <PrivateRoute>
+              <YourOrders/>
+            </PrivateRoute>}/>
       </Routes>
     </Router>
   );
